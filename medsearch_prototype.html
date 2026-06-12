@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedSearch — Klinische Suchmaschine</title>
+<script async src="https://cse.google.com/cse.js?cx=a4ef386bd72454657"></script>
+<style>
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #f7f8fa;
+    color: #1a1d23;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: #fff;
+    border-bottom: 1px solid #e5e8ed;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  .logo-mark {
+    width: 34px; height: 34px;
+    background: #0f4c8a;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-mark svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; }
+  .logo-name { font-size: 17px; font-weight: 600; color: #0f4c8a; letter-spacing: -0.02em; }
+  .logo-sub { font-size: 11px; color: #6b7280; font-weight: 400; margin-top: 1px; }
+
+  /* ── Search Form ── */
+  .search-wrap {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+    max-width: 680px;
+  }
+  .search-input-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #d1d5db;
+    border-radius: 10px;
+    background: #fff;
+    padding: 0 12px;
+    gap: 8px;
+    transition: border-color .15s;
+  }
+  .search-input-wrap:focus-within { border-color: #0f4c8a; box-shadow: 0 0 0 3px rgba(15,76,138,.1); }
+  .search-input-wrap svg { width: 16px; height: 16px; stroke: #9ca3af; flex-shrink: 0; fill: none; stroke-width: 2; stroke-linecap: round; }
+  .search-input-wrap input {
+    border: none; outline: none; background: transparent;
+    font-size: 14px; color: #1a1d23; width: 100%; padding: 9px 0;
+  }
+  .search-input-wrap input::placeholder { color: #9ca3af; }
+  .search-btn {
+    background: #0f4c8a; color: #fff;
+    border: none; border-radius: 10px;
+    padding: 0 18px; font-size: 14px; font-weight: 500;
+    cursor: pointer; white-space: nowrap;
+    transition: background .15s;
+  }
+  .search-btn:hover { background: #0a3d70; }
+
+  .audience-tag {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 500;
+    background: #eef6ff; color: #0f4c8a;
+    padding: 4px 10px; border-radius: 20px;
+    border: 1px solid #bfdbfe;
+    white-space: nowrap;
+  }
+  .audience-tag svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  /* ── Layout ── */
+  .page { display: flex; gap: 0; max-width: 1200px; margin: 0 auto; padding: 24px 24px; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 210px;
+    flex-shrink: 0;
+    margin-right: 24px;
+  }
+  .filter-section { margin-bottom: 20px; }
+  .filter-section h3 {
+    font-size: 10px; font-weight: 600; letter-spacing: .07em;
+    text-transform: uppercase; color: #9ca3af;
+    margin-bottom: 8px;
+  }
+  .filter-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 6px; border-radius: 6px;
+    cursor: pointer; font-size: 13px; color: #374151;
+    transition: background .1s;
+    user-select: none;
+  }
+  .filter-item:hover { background: #f3f4f6; }
+  .filter-item input[type=checkbox] {
+    width: 14px; height: 14px; cursor: pointer;
+    accent-color: #0f4c8a; flex-shrink: 0;
+  }
+  .filter-item label { cursor: pointer; flex: 1; }
+  .filter-count { font-size: 11px; color: #9ca3af; margin-left: auto; }
+
+  .source-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+
+  /* ── Main Results ── */
+  .main { flex: 1; min-width: 0; }
+
+  /* Google CSE override styles */
+  .gcse-wrap {
+    background: transparent;
+  }
+
+  /* ── Result Cards (manual/demo mode) ── */
+  .results-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .results-count { font-size: 13px; color: #6b7280; }
+  .results-count strong { color: #1a1d23; }
+
+  .sort-wrap { display: flex; align-items: center; gap: 6px; }
+  .sort-wrap label { font-size: 12px; color: #6b7280; }
+  .sort-wrap select {
+    font-size: 12px; border: 1px solid #e5e8ed; border-radius: 6px;
+    padding: 4px 8px; color: #374151; background: #fff; cursor: pointer;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex; gap: 0;
+    border-bottom: 1px solid #e5e8ed;
+    margin-bottom: 16px;
+  }
+  .tab {
+    padding: 8px 16px; font-size: 13px; color: #6b7280;
+    cursor: pointer; border-bottom: 2px solid transparent;
+    margin-bottom: -1px; transition: color .1s;
+  }
+  .tab:hover { color: #374151; }
+  .tab.active { color: #0f4c8a; border-bottom-color: #0f4c8a; font-weight: 500; }
+
+  /* AI Box */
+  .ai-box {
+    background: #f0fdf4; border: 1px solid #bbf7d0;
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 18px;
+  }
+  .ai-box-header {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 600; color: #15803d;
+    text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;
+  }
+  .ai-box-header svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; }
+  .ai-box p { font-size: 13px; line-height: 1.65; color: #166534; }
+
+  /* Result card */
+  .result-card {
+    background: #fff; border: 1px solid #e5e8ed;
+    border-radius: 10px; padding: 16px 18px; margin-bottom: 10px;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .result-card:hover { border-color: #bfdbfe; box-shadow: 0 2px 8px rgba(15,76,138,.07); }
+
+  .result-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px; gap: 12px; flex-wrap: wrap;
+  }
+  .result-badges { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .badge {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 20px; white-space: nowrap;
+  }
+  .badge-pubmed    { background: #d1fae5; color: #065f46; }
+  .badge-cochrane  { background: #dbeafe; color: #1e40af; }
+  .badge-guideline { background: #ede9fe; color: #5b21b6; }
+  .badge-uptodate  { background: #fef3c7; color: #92400e; }
+  .badge-new       { background: #fce7f3; color: #9d174d; }
+  .badge-who       { background: #e0f2fe; color: #0369a1; }
+
+  .evidence-pill {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 20px; border: 1px solid;
+  }
+  .ev-a { background: #f0fdf4; color: #15803d; border-color: #86efac; }
+  .ev-b { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
+  .ev-c { background: #fafafa; color: #6b7280; border-color: #d1d5db; }
+
+  .result-title {
+    font-size: 14px; font-weight: 500; color: #0f4c8a;
+    margin-bottom: 6px; line-height: 1.45; cursor: pointer;
+  }
+  .result-title:hover { text-decoration: underline; }
+  .result-snippet { font-size: 12.5px; color: #4b5563; line-height: 1.65; margin-bottom: 10px; }
+  .result-meta {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    font-size: 11px; color: #9ca3af;
+  }
+  .result-meta span { display: flex; align-items: center; gap: 4px; }
+  .result-meta svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  .result-actions {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+  }
+  .act-btn {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 500;
+    padding: 5px 10px; border-radius: 6px;
+    border: 1px solid #e5e8ed; background: transparent;
+    color: #6b7280; cursor: pointer; transition: all .1s;
+  }
+  .act-btn:hover { background: #f3f4f6; color: #374151; border-color: #d1d5db; }
+  .act-btn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
+  .act-btn-primary {
+    background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;
+  }
+  .act-btn-primary:hover { background: #dbeafe; color: #1e40af; }
+
+
+
+  /* ── Google CSE container ── */
+  #gcse-results {
+    display: none; /* shown when API key is set */
+  }
+  #demo-results { display: block; }
+
+  /* ── Setup notice ── */
+  .setup-notice {
+    background: #fffbeb; border: 1px solid #fde68a;
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 18px;
+    font-size: 12.5px; color: #78350f; line-height: 1.6;
+  }
+  .setup-notice strong { color: #92400e; }
+  .setup-notice code {
+    background: #fef3c7; padding: 1px 5px; border-radius: 4px;
+    font-family: monospace; font-size: 11px;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 700px) {
+    .sidebar { display: none; }
+    .page { padding: 12px; }
+    .header { flex-wrap: wrap; }
+    .audience-tag { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<script>
+  const CONFIG = {
+    cx:     "a4ef386bd72454657",
+    apiKey: "AIzaSyBMj0JfeXUB7RBDYcs157cdyPmF1jFBs6U",
+  };
+
+  const API_READY = CONFIG.cx !== "YOUR_SEARCH_ENGINE_CX_ID" &&
+                    CONFIG.apiKey !== "YOUR_GOOGLE_API_KEY";
+</script>
+
+<!-- ══ HEADER ════════════════════════════════ -->
+<header class="header">
+  <a class="logo" href="#" aria-label="MedSearch Startseite">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-name">MedSearch</div>
+      <div class="logo-sub">Klinische Evidenzsuche</div>
+    </div>
+  </a>
+
+  <div class="search-wrap">
+    <div class="gcse-searchbox-only"></div>
+  </div>
+
+  <div class="audience-tag" title="Optimiert für klinischen Gebrauch">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Für Mediziner
+  </div>
+</header>
+
+<!-- ══ PAGE LAYOUT ════════════════════════════ -->
+<div class="page">
+
+  <!-- Sidebar / Filter -->
+  <aside class="sidebar" aria-label="Suchfilter">
+
+    <div class="filter-section">
+      <h3>Quellen</h3>
+      <label class="filter-item">
+        <input type="checkbox" checked onchange="applyFilters()">
+        <span class="source-dot" style="background:#15803d"></span>
+        <label>Europe PMC</label>
+      </label>
+      <label class="filter-item">
+        <input type="checkbox" checked onchange="applyFilters()">
+        <span class="source-dot" style="background:#1d4ed8"></span>
+        <label>BMJ</label>
+      </label>
+      <label class="filter-item">
+        <input type="checkbox" checked onchange="applyFilters()">
+        <span class="source-dot" style="background:#7c3aed"></span>
+        <label>Leitlinien (ESC, AWMF)</label>
+      </label>
+      <label class="filter-item">
+        <input type="checkbox" checked onchange="applyFilters()">
+        <span class="source-dot" style="background:#be185d"></span>
+        <label>JAMA Network</label>
+      </label>
+      <label class="filter-item">
+        <input type="checkbox" checked onchange="applyFilters()">
+        <span class="source-dot" style="background:#0369a1"></span>
+        <label>WHO</label>
+      </label>
+    </div>
+
+    <div class="filter-section">
+      <h3>Studientyp</h3>
+      <label class="filter-item"><input type="checkbox" checked><label>Alle Typen</label></label>
+      <label class="filter-item"><input type="checkbox"><label>RCT</label></label>
+      <label class="filter-item"><input type="checkbox"><label>Meta-Analyse</label></label>
+      <label class="filter-item"><input type="checkbox"><label>Systematischer Review</label></label>
+      <label class="filter-item"><input type="checkbox"><label>Leitlinie</label></label>
+      <label class="filter-item"><input type="checkbox"><label>Kohortenstudie</label></label>
+      <label class="filter-item"><input type="checkbox"><label>Fallbericht</label></label>
+    </div>
+
+    <div class="filter-section">
+      <h3>Zeitraum</h3>
+      <label class="filter-item"><input type="radio" name="time" value="" checked><label>Alle Jahre</label></label>
+      <label class="filter-item"><input type="radio" name="time" value="y1"><label>Letztes Jahr</label></label>
+      <label class="filter-item"><input type="radio" name="time" value="y5"><label>Letzte 5 Jahre</label></label>
+      <label class="filter-item"><input type="radio" name="time" value="y10"><label>Letzte 10 Jahre</label></label>
+    </div>
+
+    <div class="filter-section">
+      <h3>Sprache</h3>
+      <label class="filter-item"><input type="checkbox" checked><label>Deutsch</label></label>
+      <label class="filter-item"><input type="checkbox" checked><label>Englisch</label></label>
+    </div>
+
+  </aside>
+
+  <!-- Main content -->
+  <main class="main" id="main-content">
+    <div class="gcse-searchresults-only"></div>
+  </main>
+</div>
+
+<!-- ══ JAVASCRIPT ════════════════════════════ -->
+<script>
+
+/* ── Demo-Daten (Fallback ohne API) ───────────────────────────── */
+const DEMO_QUERIES = {
+  default: "Metformin Herzinsuffizienz",
+  results: [
+    {
+      title: "ESC Guidelines for the Diagnosis and Treatment of Acute and Chronic Heart Failure 2023",
+      url: "https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/Acute-and-Chronic-Heart-Failure",
+      snippet: "Metformin kann bei Patienten mit stabiler Herzinsuffizienz und Typ-2-Diabetes verwendet werden (eGFR ≥30 ml/min/1,73m²). Das frühere generelle Verbot gilt als überholt. Bei akuter Dekompensation oder hämodynamischer Instabilität pausieren.",
+      source: "ESC Leitlinie", sourceClass: "badge-guideline",
+      evidenceLevel: "A", studyType: "Leitlinie",
+      year: 2023, journal: "Eur Heart J",
+      new: true
+    },
+    {
+      title: "Metformin for heart failure with type 2 diabetes mellitus: systematic review and meta-analysis",
+      url: "https://www.cochranelibrary.com/cdsr/doi/10.1002/14651858",
+      snippet: "Gepoolte Analyse von 14 RCTs (n=9.240): Metformin-Verwendung bei HF-Patienten mit T2DM zeigte keine erhöhte Mortalität (HR 0.82, 95% CI 0.71–0.94). Kein signifikanter Anstieg von Laktatazidose-Ereignissen gegenüber Placebo (OR 1.02).",
+      source: "Cochrane", sourceClass: "badge-cochrane",
+      evidenceLevel: "B", studyType: "Meta-Analyse",
+      year: 2022, journal: "Cochrane Database Syst Rev",
+      new: false
+    },
+    {
+      title: "Safety of Metformin in Patients with Heart Failure — A Population-Based Cohort Study",
+      url: "https://pubmed.ncbi.nlm.nih.gov/",
+      snippet: "Retrospektive Kohortenstudie (n=41.200, Dänisches Register): Metformin-Anwender mit HFrEF hatten im Vergleich zu Sulfonylurea-Nutzern eine niedrigere 30-Tage-Hospitalisierungsrate (OR 0.76, p<0.001). Keine Häufung von Laktatazidose detektiert.",
+      source: "PubMed", sourceClass: "badge-pubmed",
+      evidenceLevel: "B", studyType: "Kohortenstudie",
+      year: 2021, journal: "N Engl J Med",
+      new: false
+    },
+    {
+      title: "Diabetes and heart failure: managing a high-risk combination — WHO Technical Report",
+      url: "https://www.who.int/publications/",
+      snippet: "WHO empfiehlt bei Koexistenz von T2DM und Herzinsuffizienz eine individualisierte Antidiabetikawahl. SGLT2-Hemmer als First-Line bei HFrEF, Metformin als sichere Option bei stabiler HF ohne schwere Niereninsuffizienz.",
+      source: "WHO", sourceClass: "badge-who",
+      evidenceLevel: "C", studyType: "Leitlinie",
+      year: 2023, journal: "WHO",
+      new: false
+    }
+  ]
+};
+
+/* ── Render Demo-Ergebnisse ──────────────────────────────────── */
+function renderDemoResults(query) {
+  const container = document.getElementById("demo-results");
+  const q = query || DEMO_QUERIES.default;
+
+  // KI-Zusammenfassung
+  const aiBox = `
+    <div class="ai-box">
+      <div class="ai-box-header">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        KI-Zusammenfassung (experimentell)
+      </div>
+      <p>Metformin galt lange als kontraindiziert bei Herzinsuffizienz (Laktatazidose-Risiko). Aktuelle ESC-Leitlinien 2023 erlauben Metformin bei <strong>stabiler HF</strong> mit erhaltener/reduzierter EF, solange eGFR ≥30 ml/min/1,73m². Bei akuter Dekompensation weiterhin pausieren. SGLT2-Hemmer sind bei HFrEF die bevorzugte Erstlinientherapie bei T2DM.</p>
+    </div>`;
+
+  // Ergebnis-Header
+  const header = `
+    <div class="results-header">
+      <div class="results-count">
+        <strong>${DEMO_QUERIES.results.length} Ergebnisse</strong> für „${escapeHtml(q)}"
+        ${API_READY ? '' : '<span style="font-size:11px;color:#d97706;margin-left:8px">(Demo-Modus)</span>'}
+      </div>
+      <div class="sort-wrap">
+        <label for="sort-select">Sortierung:</label>
+        <select id="sort-select" onchange="sortResults(this.value)">
+          <option value="relevance">Relevanz</option>
+          <option value="date">Datum</option>
+          <option value="evidence">Evidenzlevel</option>
+        </select>
+      </div>
+    </div>`;
+
+  // Karten
+  const cards = DEMO_QUERIES.results.map(r => renderCard(r)).join("");
+
+  container.innerHTML = aiBox + header + cards;
+}
+
+function renderCard(r) {
+  const evClass = r.evidenceLevel === "A" ? "ev-a" : r.evidenceLevel === "B" ? "ev-b" : "ev-c";
+
+  return `
+    <article class="result-card">
+      <div class="result-top">
+        <div class="result-badges">
+          <span class="badge ${r.sourceClass}">${r.source}</span>
+          <span class="badge" style="background:#f3f4f6;color:#374151">${r.studyType}</span>
+          ${r.new ? '<span class="badge badge-new">Aktuell</span>' : ""}
+          <span class="evidence-pill ${evClass}">Evidenz ${r.evidenceLevel}</span>
+        </div>
+      </div>
+      <div class="result-title" onclick="openLink('${r.url}')" role="link" tabindex="0"
+           onkeydown="if(event.key==='Enter')openLink('${r.url}')">${escapeHtml(r.title)}</div>
+      <div class="result-snippet">${escapeHtml(r.snippet)}</div>
+      <div class="result-meta">
+        <span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          ${r.year}
+        </span>
+        <span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          ${r.journal}
+        </span>
+      </div>
+      <div class="result-actions">
+        <button class="act-btn act-btn-primary" onclick="openLink('${r.url}')">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Volltext öffnen
+        </button>
+        <button class="act-btn" onclick="saveResult(this)" title="Ergebnis speichern">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          Merken
+        </button>
+        <button class="act-btn" title="Zitat kopieren" onclick="copyCitation('${escapeAttr(r.title)}', ${r.year}, '${escapeAttr(r.journal)}')">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Zitieren
+        </button>
+      </div>
+    </article>`;
+}
+
+/* ── Google Custom Search API ────────────────────────────────── */
+async function fetchGoogleResults(query) {
+  const url = `https://www.googleapis.com/customsearch/v1?key=${CONFIG.apiKey}&cx=${CONFIG.cx}&q=${encodeURIComponent(query)}&num=10`;
+  try {
+    const resp = await fetch(url);
+    const data = await resp.json();
+    if (!resp.ok) return { items: null, error: data?.error?.message || `HTTP ${resp.status}` };
+    return { items: data.items || [], error: null };
+  } catch (e) {
+    return { items: null, error: e.message };
+  }
+}
+
+function renderGoogleResults(items, query) {
+  const container = document.getElementById("gcse-results");
+  if (!items || items.length === 0) {
+    container.innerHTML = `<p style="color:#6b7280;font-size:13px;padding:16px 0">Keine Ergebnisse gefunden für „${escapeHtml(query)}".</p>`;
+    return;
+  }
+
+  const header = `
+    <div class="results-header">
+      <div class="results-count"><strong>${items.length} Ergebnisse</strong> für „${escapeHtml(query)}"</div>
+    </div>`;
+
+  const cards = items.map(item => {
+    const domain = new URL(item.link).hostname.replace("www.", "");
+    const sourceInfo = classifySource(domain);
+    return `
+      <article class="result-card">
+        <div class="result-top">
+          <div class="result-badges">
+            <span class="badge ${sourceInfo.cls}">${sourceInfo.label}</span>
+
+          </div>
+          <span style="font-size:11px;color:#9ca3af">${domain}</span>
+        </div>
+        <div class="result-title" onclick="openLink('${item.link}')" role="link" tabindex="0">${escapeHtml(item.title)}</div>
+        <div class="result-snippet">${escapeHtml(item.snippet || "")}</div>
+        <div class="result-actions">
+          <button class="act-btn act-btn-primary" onclick="openLink('${item.link}')">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Öffnen
+          </button>
+          <button class="act-btn" onclick="saveResult(this)">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            Merken
+          </button>
+        </div>
+      </article>`;
+  }).join("");
+
+  container.innerHTML = header + cards;
+}
+
+function classifySource(domain) {
+  if (domain.includes("europepmc") || domain.includes("europe.pmc"))
+    return { label: "Europe PMC", cls: "badge-pubmed" };
+  if (domain.includes("ncbi.nlm.nih.gov"))
+    return { label: "PMC", cls: "badge-pubmed" };
+  if (domain.includes("bmj.com"))
+    return { label: "BMJ", cls: "badge-cochrane" };
+  if (domain.includes("jamanetwork") || domain.includes("jama"))
+    return { label: "JAMA", cls: "badge-cochrane" };
+  if (domain.includes("escardio") || domain.includes("awmf") || domain.includes("dgim"))
+    return { label: "Leitlinie", cls: "badge-guideline" };
+  if (domain.includes("who.int"))
+    return { label: "WHO", cls: "badge-who" };
+  if (domain.includes("thelancet"))
+    return { label: "The Lancet", cls: "badge-cochrane" };
+  return { label: domain, cls: "" };
+}
+
+/* ── Search logic ────────────────────────────────────────────── */
+async function doSearch() {
+  const query = document.getElementById("search-input").value.trim();
+  if (!query) return;
+
+  const btn = document.getElementById("search-btn");
+  btn.textContent = "Suche…";
+  btn.disabled = true;
+
+  document.getElementById("demo-results").innerHTML = "";
+  document.getElementById("gcse-results").style.display = "block";
+  document.getElementById("gcse-results").innerHTML =
+    `<div style="padding:24px;text-align:center;color:#9ca3af;font-size:13px">Suchergebnisse werden geladen…</div>`;
+
+  const { items, error } = await fetchGoogleResults(query);
+
+  if (error) {
+    document.getElementById("gcse-results").innerHTML =
+      `<div style="padding:16px;background:#fef3c7;border:1px solid #fde68a;border-radius:10px;font-size:13px;color:#78350f">
+        <strong>API-Fehler:</strong> ${escapeHtml(error)}<br>
+        <span style="font-size:12px;color:#92400e">Prüfe API-Key und CX-ID in der CONFIG-Variable oben im Code.</span>
+      </div>`;
+  } else if (items.length === 0) {
+    document.getElementById("gcse-results").innerHTML =
+      `<p style="color:#6b7280;font-size:13px;padding:16px 0">Keine Ergebnisse für „${escapeHtml(query)}".</p>`;
+  } else {
+    renderGoogleResults(items, query);
+  }
+
+  btn.textContent = "Suchen";
+  btn.disabled = false;
+}
+
+/* ── Tab-Wechsel ─────────────────────────────────────────────── */
+function switchTab(el, type) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  el.classList.add("active");
+  // In echter Implementierung: Ergebnisse nach Studientyp filtern
+}
+
+/* ── Filter ──────────────────────────────────────────────────── */
+function applyFilters() {
+  // In echter Implementierung: Suchanfrage mit site:-Operatoren neu starten
+  // Beispiel: "metformin site:pubmed.ncbi.nlm.nih.gov OR site:cochranelibrary.com"
+}
+
+/* ── Sortierung ──────────────────────────────────────────────── */
+function sortResults(val) {
+  // Demo: nur Hinweis
+  console.log("Sort by:", val);
+}
+
+/* ── Aktionen ────────────────────────────────────────────────── */
+function saveResult(btn) {
+  btn.style.background = "#d1fae5";
+  btn.style.color = "#065f46";
+  btn.style.borderColor = "#6ee7b7";
+  btn.querySelector("svg").setAttribute("fill", "#065f46");
+  btn.title = "Gespeichert";
+}
+
+function copyCitation(title, year, journal) {
+  const citation = `${title}. ${journal}, ${year}.`;
+  navigator.clipboard.writeText(citation).then(() => {
+    showToast("Zitat kopiert!");
+  }).catch(() => {
+    showToast("Zitat: " + citation);
+  });
+}
+
+function openLink(url) {
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function showToast(msg) {
+  const t = document.createElement("div");
+  t.textContent = msg;
+  Object.assign(t.style, {
+    position:"fixed", bottom:"24px", left:"50%", transform:"translateX(-50%)",
+    background:"#1a1d23", color:"#fff", padding:"8px 16px",
+    borderRadius:"8px", fontSize:"13px", zIndex:"9999",
+    boxShadow:"0 4px 12px rgba(0,0,0,.2)"
+  });
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+/* ── Helpers ─────────────────────────────────────────────────── */
+function escapeHtml(str) {
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function escapeAttr(str) {
+  return String(str).replace(/'/g,"\\'");
+}
+
+/* ── Enter-Taste ─────────────────────────────────────────────── */
+document.getElementById("search-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") doSearch();
+});
+
+/* ── Init ────────────────────────────────────────────────────── */
+(function init() {
+  if (API_READY) {
+    document.getElementById("setup-notice").style.display = "none";
+  }
+  // Demo-Ergebnisse beim Start laden
+  renderDemoResults(DEMO_QUERIES.default);
+  document.getElementById("search-input").value = DEMO_QUERIES.default;
+})();
+
+</script>
+</body>
+</html>
