@@ -1,232 +1,104 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MedSearch — Klinische Evidenzsuche</title>
-<script async src="https://cse.google.com/cse.js?cx=a4ef386bd72454657"></script>
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { font-size: 16px; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    background: #f7f8fa;
-    color: #1a1d23;
-    min-height: 100vh;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedSearch — Klinische Evidenzsuche</title>
 
-  /* ── Header ── */
-  .header {
-    background: #fff;
-    border-bottom: 1px solid #e5e8ed;
-    padding: 12px 24px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-    text-decoration: none;
-  }
-  .logo-mark {
-    width: 34px; height: 34px;
-    background: #0f4c8a;
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .logo-mark svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; }
-  .logo-name { font-size: 17px; font-weight: 600; color: #0f4c8a; letter-spacing: -0.02em; }
-  .logo-sub { font-size: 11px; color: #6b7280; }
-  .audience-pill {
-    font-size: 11px; font-weight: 500;
-    background: #e0f2fe; color: #0369a1;
-    border-radius: 20px; padding: 3px 10px;
-  }
+  <!-- Google Programmable Search Engine -->
+  <script async src="https://cse.google.com/cse.js?cx=a4ef386bd72454657"></script>
 
-  /* ── Layout ── */
-  .layout {
-    display: flex;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 24px 16px;
-    gap: 24px;
-    align-items: flex-start;
-  }
-
-  /* ── Sidebar ── */
-  .sidebar {
-    width: 200px;
-    flex-shrink: 0;
-    background: #fff;
-    border: 1px solid #e5e8ed;
-    border-radius: 12px;
-    padding: 16px;
-    position: sticky;
-    top: 76px;
-  }
-  .filter-section { margin-bottom: 20px; }
-  .filter-section:last-child { margin-bottom: 0; }
-  .filter-section h3 {
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: #9ca3af;
-    margin-bottom: 8px;
-  }
-  .filter-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 6px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    color: #374151;
-    margin-bottom: 2px;
-    user-select: none;
-  }
-  .filter-item:hover { background: #f3f4f6; }
-  .filter-item input { cursor: pointer; accent-color: #0f4c8a; }
-  .source-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  /* ── Main / CSE area ── */
-  .main { flex: 1; min-width: 0; }
-
-  /* ── CSE Widget Styling ── */
-  .gcse-wrap {
-    background: #fff;
-    border: 1px solid #e5e8ed;
-    border-radius: 12px;
-    padding: 20px;
-    min-height: 300px;
-  }
-
-  /* Override some CSE default styles */
-  .gsc-control-cse {
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-    font-family: inherit !important;
-  }
-  /*.gsc-search-box { display: none !important; }*/ /* hide CSE's own search box */
-  .gsc-result-info { font-size: 12px; color: #6b7280; margin-bottom: 12px; }
-  .gs-result .gs-title { color: #0f4c8a !important; font-size: 15px !important; }
-  .gs-result .gs-title b { color: #0f4c8a !important; }
-  .gsc-url-top { color: #15803d !important; font-size: 12px !important; }
-  .gs-snippet { font-size: 13px !important; color: #4b5563 !important; line-height: 1.6 !important; }
-  .gsc-cursor-box { margin-top: 16px; }
-  .gsc-cursor-page {
-    background: #0f4c8a !important;
-    color: #fff !important;
-    border-radius: 6px !important;
-    padding: 4px 10px !important;
-    font-size: 13px !important;
-  }
-
-  /* ── Responsive ── */
-  @media (max-width: 640px) {
-    .sidebar { display: none; }
-    .layout { padding: 12px; }
-  }
-</style>
+  <!-- Eigene CSS-Datei -->
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<!-- Header -->
-<header class="header">
-  <a class="logo" href="#">
-    <div class="logo-mark">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="11" cy="11" r="8"/>
-        <path d="m21 21-4.35-4.35"/>
-        <path d="M11 8v6M8 11h6"/>
-      </svg>
-    </div>
-    <div>
-      <div class="logo-name">MedSearch</div>
-      <div class="logo-sub">Klinische Evidenzsuche</div>
-    </div>
-  </a>
-  <span class="audience-pill">👨‍⚕️ Für Mediziner</span>
+  <!-- Header -->
+  <header class="header">
+    <a class="logo" href="#">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+          <path d="M11 8v6M8 11h6"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">MedSearch</div>
+        <div class="logo-sub">Klinische Evidenzsuche</div>
+      </div>
+    </a>
 
-  <!-- CSE Suchfeld im Header -->
-  <div style="flex:1; max-width:520px;">
-    <div class="gcse-searchbox-only"></div>
+    <span class="audience-pill">👨‍⚕️ Für Mediziner</span>
+
+    <!-- Suchleiste -->
+    <div class="search-header">
+      <div class="gcse-searchbox"></div>
+    </div>
+  </header>
+
+  <!-- Layout -->
+  <div class="layout">
+
+    <!-- Sidebar Filter -->
+    <aside class="sidebar" aria-label="Suchfilter">
+      <div class="filter-section">
+        <h3>Quellen</h3>
+        <label class="filter-item">
+          <span class="source-dot green"></span>
+          PubMed
+        </label>
+        <label class="filter-item">
+          <span class="source-dot blue"></span>
+          Cochrane Library
+        </label>
+        <label class="filter-item">
+          <span class="source-dot purple"></span>
+          ESC / AWMF
+        </label>
+        <label class="filter-item">
+          <span class="source-dot orange"></span>
+          UpToDate
+        </label>
+        <label class="filter-item">
+          <span class="source-dot cyan"></span>
+          WHO
+        </label>
+      </div>
+
+      <div class="filter-section">
+        <h3>Studientyp</h3>
+        <label class="filter-item"><input type="checkbox" checked><span>Alle Typen</span></label>
+        <label class="filter-item"><input type="checkbox"><span>RCT</span></label>
+        <label class="filter-item"><input type="checkbox"><span>Meta-Analyse</span></label>
+        <label class="filter-item"><input type="checkbox"><span>Systematischer Review</span></label>
+        <label class="filter-item"><input type="checkbox"><span>Leitlinie</span></label>
+        <label class="filter-item"><input type="checkbox"><span>Kohortenstudie</span></label>
+      </div>
+
+      <div class="filter-section">
+        <h3>Zeitraum</h3>
+        <label class="filter-item"><input type="radio" name="time" checked><span>Alle Jahre</span></label>
+        <label class="filter-item"><input type="radio" name="time"><span>Letzte 5 Jahre</span></label>
+        <label class="filter-item"><input type="radio" name="time"><span>Letzte 10 Jahre</span></label>
+      </div>
+
+      <div class="filter-section">
+        <h3>Sprache</h3>
+        <label class="filter-item"><input type="checkbox" checked><span>Deutsch</span></label>
+        <label class="filter-item"><input type="checkbox" checked><span>Englisch</span></label>
+      </div>
+    </aside>
+
+    <!-- Suchergebnisse -->
+    <main class="main">
+      <div class="gcse-wrap">
+        <div class="gcse-searchresults"></div>
+      </div>
+    </main>
+
   </div>
-</header>
-
-<!-- Layout -->
-<div class="layout">
-
-  <!-- Sidebar Filter (visuell, informativ) -->
-  <aside class="sidebar" aria-label="Suchfilter">
-    <div class="filter-section">
-      <h3>Quellen</h3>
-      <label class="filter-item">
-        <span class="source-dot" style="background:#15803d"></span>
-        PubMed
-      </label>
-      <label class="filter-item">
-        <span class="source-dot" style="background:#1d4ed8"></span>
-        Cochrane Library
-      </label>
-      <label class="filter-item">
-        <span class="source-dot" style="background:#7c3aed"></span>
-        ESC / AWMF
-      </label>
-      <label class="filter-item">
-        <span class="source-dot" style="background:#d97706"></span>
-        UpToDate
-      </label>
-      <label class="filter-item">
-        <span class="source-dot" style="background:#0369a1"></span>
-        WHO
-      </label>
-    </div>
-
-    <div class="filter-section">
-      <h3>Studientyp</h3>
-      <label class="filter-item"><input type="checkbox" checked><span>Alle Typen</span></label>
-      <label class="filter-item"><input type="checkbox"><span>RCT</span></label>
-      <label class="filter-item"><input type="checkbox"><span>Meta-Analyse</span></label>
-      <label class="filter-item"><input type="checkbox"><span>Systematischer Review</span></label>
-      <label class="filter-item"><input type="checkbox"><span>Leitlinie</span></label>
-      <label class="filter-item"><input type="checkbox"><span>Kohortenstudie</span></label>
-    </div>
-
-    <div class="filter-section">
-      <h3>Zeitraum</h3>
-      <label class="filter-item"><input type="radio" name="time" checked><span>Alle Jahre</span></label>
-      <label class="filter-item"><input type="radio" name="time"><span>Letzte 5 Jahre</span></label>
-      <label class="filter-item"><input type="radio" name="time"><span>Letzte 10 Jahre</span></label>
-    </div>
-
-    <div class="filter-section">
-      <h3>Sprache</h3>
-      <label class="filter-item"><input type="checkbox" checked><span>Deutsch</span></label>
-      <label class="filter-item"><input type="checkbox" checked><span>Englisch</span></label>
-    </div>
-  </aside>
-
-  <!-- CSE Ergebnisse -->
-  <main class="main">
-    <div class="gcse-wrap">
-      <div class="gcse-searchresults-only"></div>
-    </div>
-  </main>
-
-</div>
 
 </body>
 </html>

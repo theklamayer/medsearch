@@ -1,0 +1,267 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: #f7f8fa;
+  color: #1a1d23;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  background: #fff;
+  border-bottom: 1px solid #e5e8ed;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.logo-mark {
+  width: 34px;
+  height: 34px;
+  background: #0f4c8a;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-mark svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.logo-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: #0f4c8a;
+  letter-spacing: -0.02em;
+}
+
+.logo-sub {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.audience-pill {
+  font-size: 11px;
+  font-weight: 500;
+  background: #e0f2fe;
+  color: #0369a1;
+  border-radius: 20px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+.search-header {
+  flex: 1;
+  max-width: 520px;
+  margin-left: 20px;
+}
+
+/* Layout */
+.layout {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  background: #fff;
+  border: 1px solid #e5e8ed;
+  border-radius: 12px;
+  padding: 16px;
+  position: sticky;
+  top: 76px;
+}
+
+.filter-section {
+  margin-bottom: 20px;
+}
+
+.filter-section:last-child {
+  margin-bottom: 0;
+}
+
+.filter-section h3 {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: #9ca3af;
+  margin-bottom: 8px;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #374151;
+  margin-bottom: 2px;
+  user-select: none;
+}
+
+.filter-item:hover {
+  background: #f3f4f6;
+}
+
+.filter-item input {
+  cursor: pointer;
+  accent-color: #0f4c8a;
+}
+
+.source-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.source-dot.green { background: #15803d; }
+.source-dot.blue { background: #1d4ed8; }
+.source-dot.purple { background: #7c3aed; }
+.source-dot.orange { background: #d97706; }
+.source-dot.cyan { background: #0369a1; }
+
+/* Main */
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.gcse-wrap {
+  background: #fff;
+  border: 1px solid #e5e8ed;
+  border-radius: 12px;
+  padding: 20px;
+  min-height: 300px;
+}
+
+/* Google Search Styling */
+.gsc-control-cse {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  font-family: inherit !important;
+}
+
+.gsc-control-searchbox-only,
+.gsc-control-searchbox {
+  background: transparent !important;
+  border: none !important;
+}
+
+.gsc-search-box-tools .gsc-search-box {
+  margin: 0 !important;
+}
+
+.gsc-input-box {
+  border-radius: 8px !important;
+  border: 1px solid #d1d5db !important;
+  height: 42px !important;
+}
+
+.gsc-input {
+  font-size: 14px !important;
+}
+
+.gsc-search-button-v2 {
+  border-radius: 8px !important;
+  background: #0f4c8a !important;
+  border: none !important;
+  padding: 11px 18px !important;
+}
+
+.gsc-result-info {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.gs-result .gs-title {
+  color: #0f4c8a !important;
+  font-size: 15px !important;
+}
+
+.gs-result .gs-title b {
+  color: #0f4c8a !important;
+}
+
+.gsc-url-top {
+  color: #15803d !important;
+  font-size: 12px !important;
+}
+
+.gs-snippet {
+  font-size: 13px !important;
+  color: #4b5563 !important;
+  line-height: 1.6 !important;
+}
+
+.gsc-cursor-box {
+  margin-top: 16px;
+}
+
+.gsc-cursor-page {
+  background: #0f4c8a !important;
+  color: #fff !important;
+  border-radius: 6px !important;
+  padding: 4px 10px !important;
+  font-size: 13px !important;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .header {
+    flex-wrap: wrap;
+  }
+
+  .search-header {
+    order: 3;
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .layout {
+    padding: 12px;
+  }
+}
